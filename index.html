@@ -1,9 +1,328 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>SYW Workshop</title>
-  </head>
-  <body>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="임진록에 사용되는 SPR, YTL, YAV, PAL을 보거나 변환할 수 있는 작업실">
+
+        <link rel="stylesheet" href="./assets/style/tinyreset.min.css">
+        <link rel="stylesheet" href="./assets/style/utils.min.css">
+        <link rel="stylesheet" href="./style.css">
+        
+        <title>SYW Workshop</title>
+    </head>
+    <body class="bgrn-primary overflow-y-auto">
+        <!-- HEADER -->
+        <header id="header" class="w-full bgrn-white flex flex-col border-b select-none">
+            <div class="flex items-center justify-between g-4 p-4 border-b">
+                <h1 class="bold">SYW Workshop</h1>
+                <button type="button" id="btnToggleMenu" class="border-none outline-none bgrn-transparent text-l text-tertiary cursor-pointer transition-colors duration-250" title="메뉴" onclick="toggleMenu(event)">&#9776;</button>
+            </div>
+
+            <div class="flex items-center" role="tab">
+                <label role="tablist" for="radioTabSpr" class="px-4 py-2 cursor-pointer transition-colors duration-250" title="SPR" onclick="openTab('spr')">
+                    <span class="text-s text-tertiary">SPR</span>
+                    <input type="radio" name="radioTabGroup" id="radioTabSpr" class="absolute" checked>
+                </label>
+                <label role="tablist" for="radioTabYtl" class="px-4 py-2 cursor-pointer transition-colors duration-250" title="YTL" onclick="openTab('ytl')">
+                    <span class="text-s text-tertiary">YTL</span>
+                    <input type="radio" name="radioTabGroup" id="radioTabYtl" class="absolute">
+                </label>
+                <label role="tablist" for="radioTabYav" class="px-4 py-2 cursor-pointer transition-colors duration-250" title="YAV" onclick="openTab('yav')">
+                    <span class="text-s text-tertiary">YAV</span>
+                    <input type="radio" name="radioTabGroup" id="radioTabYav" class="absolute">
+                </label>
+            </div>
+        </header>
+
+        <!-- MAIN -->
+        <main id="main">
+            <div id="spr" class="relative">
+                <canvas id="canvasSpr"></canvas>
+            </div>
+
+            <div id="ytl" hidden class="relative">
+                <canvas id="canvasYtl"></canvas>
+            </div>
+
+            <div id="yav" hidden>
+                <audio id="audioYav" src="" controls></audio>
+            </div>
+        </main>
+
+        <!-- MENU -->
+        <div id="menu" class="show fixed t-0 b-0 w-300 border-r bgrn-white p-4 select-none transition-offsets duration-250 overflow-y-auto">
+            <div id="sprMenu" class="flex flex-col g-2">
+                <!-- 기능 -->
+                <div class="flex flex-col g-2">
+                    <h4 class="text-xs text-main">기능</h4>
     
-  </body>
+                    <div class="flex flex-col g-2">
+                        <div class="flex items-center g-2">
+                            <label for="chkboxSprGrid" class="flex items-center g-2 cursor-pointer" title="격자">
+                                <input type="checkbox" id="chkboxSprGrid" onchange="g_SYW.Spr.EventOnChangeGrid(event)">
+                                <span class="text-s text-tertiary">격자</span>
+                            </label>
+                        </div>
+    
+                        <div class="flex flex-col g-2">
+                            <label for="rangeSprBgrnAlpha" class="flex items-center g-2" title="배경 투명도">
+                                <span class="text-s text-tertiary">배경 투명도</span>
+                                <input type="range" id="rangeSprBgrnAlpha" min="0" max="255" value="255" step="1" oninput="g_SYW.Spr.EventOnInputBgrnAlpha(event)">
+                                <span class="text-s text-tertiary">255</span>
+                            </label>
+    
+                            <label for="rangeSprAlpha" class="flex items-center g-2" title="일반 투명도">
+                                <span class="text-s text-tertiary">일반 투명도</span>
+                                <input type="range" id="rangeSprAlpha" min="0" max="255" value="255" step="1" oninput="g_SYW.Spr.EventOnInputAlpha(event)">
+                                <span class="text-s text-tertiary">255</span>
+                            </label>
+                        </div>
+
+                        <button type="button" id="btnDrawSpr" class="border-none outline-none bgrn-main text-xs text-white px-4 py-2 w-full cursor-pointer" title="그리기" onclick="g_SYW.Spr.fnDrawSpr()">그리기</button>
+                    </div>
+                </div>
+                <hr>
+
+                <!-- SPR -->
+                <div class="flex flex-col g-2">
+                    <h4 class="text-xs text-main">SPR</h4>
+
+                    <table id="tableSprInfo">
+                        <thead>
+                            <tr>
+                                <th>이미지 크기</th>
+                                <th>프레임 크기</th>
+                                <th>프레임 구성</th>
+                            </tr>
+                        </thead>
+                        <tbody><tr></tr></tbody>
+                    </table>
+
+                    <select id="selectSpr" class="border-none outline-none bgrn-main-90p p-2 text-xs text-tertiary" onchange="g_SYW.Spr.EventOnChangeSelectSpr(event)">
+                        <option value="" hidden selected>SPR 목록</option>
+                    </select>
+
+                    <div class="grid grid-cols-2 g-2">
+                        <button type="button" id="btnLoadSpr" class="border-none outline-none bgrn-main text-xs text-white px-4 py-2 w-full cursor-pointer" title="불러오기" onclick="g_SYW.Spr.fnLoadSpr()">불러오기</button>
+                        <button type="button" id="btnExportBmp" class="border-none outline-none bgrn-main text-xs text-white px-4 py-2 w-full cursor-pointer" title="BMP 저장" onclick="g_SYW.Spr.fnExportBmp()">BMP 저장</button>
+                    </div>
+                </div>
+                <hr>
+
+                <!-- PAL -->
+                <div class="flex flex-col g-2">
+                    <h4 class="text-xs text-main">PAL</h4>
+
+                    <select id="selectPal4Spr" class="border-none outline-none bgrn-main-90p p-2 text-xs text-tertiary" onchange="g_SYW.Spr.EventOnchangeSelectPal4Spr(event)">
+                        <option value="" hidden selected>PAL 목록</option>
+                    </select>
+
+                    <select id="selectConvPal4Spr" class="border-none outline-none bgrn-main-90p p-2 text-xs text-tertiary" onchange="g_SYW.Spr.EventOnchangeConvPal4Spr(event)">
+                        <option value="" hidden selected>변환 PAL 목록</option>
+                    </select>
+
+                    <div class="grid grid-cols-2 g-2">
+                        <button type="button" id="btnLoadPal4Spr" class="border-none outline-none bgrn-main text-xs text-white px-4 py-2 w-full cursor-pointer" title="불러오기" onclick="g_SYW.Spr.fnLoadPal()">불러오기</button>
+                        <button type="button" id="btnConvNSavePal4Spr" class="border-none outline-none bgrn-main text-xs text-white px-4 py-2 w-full cursor-pointer" title="변환 및 저장" onclick="g_SYW.Spr.fnConvNSavePal()">변환 및 저장</button>
+                    </div>
+                </div>
+                <hr>
+
+                <!-- Animation -->
+                <div class="flex flex-col g-2">
+                    <h4 class="text-xs text-main">ANIMATION</h4>
+
+                    <div class="flex flex-col g-2">
+                        <label for="numboxSprStartFrame" class="flex items-center g-2" title="시작 프레임">
+                            <span class="text-s text-tertiary whitespace-nowrap">시작 프레임</span>
+                            <input type="number" id="numboxSprStartFrame" class="border-none outline-none bgrn-main-90p text-s text-tertiary p-2 w-full" min="0" value="0">
+                        </label>
+                        <label for="numboxSprEndFrame" class="flex items-center g-2" title="종료 프레임">
+                            <span class="text-s text-tertiary whitespace-nowrap">종료 프레임</span>
+                            <input type="number" id="numboxSprEndFrame" class="border-none outline-none bgrn-main-90p text-s text-tertiary p-2 w-full" min="0" value="0">
+                        </label>
+                        <label for="numboxSprFrameSpeed" class="flex items-center g-2" title="프레임 속도">
+                            <span class="text-s text-tertiary whitespace-nowrap">프레임 속도</span>
+                            <input type="number" id="numboxSprFrameSpeed" class="border-none outline-none bgrn-main-90p text-s text-tertiary p-2 w-full" min="0" value="15">
+                        </label>
+                    </div>
+
+                    <div class="flex items-center g-2">
+                        <button type="button" id="btnPlaySpr" class="border-none outline-none bgrn-main text-xs text-white px-4 py-2 w-full cursor-pointer" title="재생" onclick="g_SYW.Spr.fnPlaySpr()">재생</button>
+                    </div>
+                </div>
+                <hr>
+
+                <!-- IMG2SPR -->
+                <div class="flex flex-col g-2">
+                    <h4 class="text-xs text-main">IMG &rightarrow; SPR</h4>
+
+                    <div class="flex flex-col g-2">
+                        <label for="numboxConvImg2SprFrameWidth" class="flex items-center g-2" title="프레임 가로">
+                            <span class="text-s text-tertiary whitespace-nowrap">프레임 가로</span>
+                            <input type="number" id="numboxConvImg2SprFrameWidth" class="border-none outline-none bgrn-main-90p text-s text-tertiary p-2 w-full" min="0" value="0">
+                        </label>
+                        <label for="numboxConvImg2SprFrameHeight" class="flex items-center g-2" title="프레임 세로">
+                            <span class="text-s text-tertiary whitespace-nowrap">프레임 세로</span>
+                            <input type="number" id="numboxConvImg2SprFrameHeight" class="border-none outline-none bgrn-main-90p text-s text-tertiary p-2 w-full" min="0" value="0">
+                        </label>
+                        <label for="numboxConvImg2SprNumberOfFrames" class="flex items-center g-2" title="프레임 개수">
+                            <span class="text-s text-tertiary whitespace-nowrap">프레임 개수</span>
+                            <input type="number" id="numboxConvImg2SprNumberOfFrames" class="border-none outline-none bgrn-main-90p text-s text-tertiary p-2 w-full" min="0" value="0">
+                        </label>
+                    </div>
+
+                    <div class="flex items-center g-2">
+                        <button type="button" id="btnLoadNConvImg4Spr" class="border-none outline-none bgrn-main text-xs text-white px-4 py-2 w-full cursor-pointer" title="불러오기 및 변환" onclick="g_SYW.Spr.fnConvImg4Spr()">불러오기 및 변환</button>
+                    </div>
+                </div>
+                <hr>
+            </div>
+
+            <div id="ytlMenu" hidden class="flex flex-col g-2">
+                <!-- 기능 -->
+                <div class="flex flex-col g-2">
+                    <h4 class="text-xs text-main">기능</h4>
+    
+                    <div class="flex flex-col g-2">
+                        <div class="flex items-center g-2">
+                            <label for="chkboxYtlGrid" class="flex items-center g-2 cursor-pointer" title="격자">
+                                <input type="checkbox" id="chkboxYtlGrid" onchange="g_SYW.Ytl.EventOnChangeGrid(event)">
+                                <span class="text-s text-tertiary">격자</span>
+                            </label>
+                        </div>
+    
+                        <div class="flex flex-col g-2">
+                            <label for="rangeYtlBgrnAlpha" class="flex items-center g-2" title="배경 투명도">
+                                <span class="text-s text-tertiary">배경 투명도</span>
+                                <input type="range" id="rangeYtlBgrnAlpha" min="0" max="255" value="255" step="1" oninput="g_SYW.Ytl.EventOnInputBgrnAlpha(event)">
+                                <span class="text-s text-tertiary">255</span>
+                            </label>
+    
+                            <label for="rangeYtlAlpha" class="flex items-center g-2" title="일반 투명도">
+                                <span class="text-s text-tertiary">일반 투명도</span>
+                                <input type="range" id="rangeYtlAlpha" min="0" max="255" value="255" step="1" oninput="g_SYW.Ytl.EventOnInputAlpha(event)">
+                                <span class="text-s text-tertiary">255</span>
+                            </label>
+                        </div>
+
+                        <button type="button" id="btnDrawYtl" class="border-none outline-none bgrn-main text-xs text-white px-4 py-2 w-full cursor-pointer" title="그리기" onclick="g_SYW.Ytl.fnDrawYtl()">그리기</button>
+                    </div>
+                </div>
+                <hr>
+
+                <!-- YTL -->
+                <div class="flex flex-col g-2">
+                    <h4 class="text-xs text-main">YTL</h4>
+
+                    <table id="tableYtlInfo">
+                        <thead>
+                            <tr>
+                                <th>이미지 크기</th>
+                                <th>타일 크기</th>
+                                <th>타일 구성</th>
+                            </tr>
+                        </thead>
+                        <tbody><tr></tr></tbody>
+                    </table>
+
+                    <select id="selectYtl" class="border-none outline-none bgrn-main-90p p-2 text-xs text-tertiary" onchange="g_SYW.Ytl.EventOnChangeSelectYtl(event)">
+                        <option value="" hidden selected>YTL 목록</option>
+                    </select>
+
+                    <div class="grid grid-cols-2 g-2">
+                        <button type="button" id="btnLoadYtl" class="border-none outline-none bgrn-main text-xs text-white px-4 py-2 w-full cursor-pointer" title="불러오기" onclick="g_SYW.Ytl.fnLoadYtl()">불러오기</button>
+                        <button type="button" id="btnExportBmp2" class="border-none outline-none bgrn-main text-xs text-white px-4 py-2 w-full cursor-pointer" title="BMP 저장" onclick="g_SYW.Ytl.fnExportBmp()">BMP 저장</button>
+                    </div>
+                </div>
+                <hr>
+
+                <!-- PAL -->
+                <div class="flex flex-col g-2">
+                    <h4 class="text-xs text-main">PAL</h4>
+
+                    <select id="selectPal4Ytl" class="border-none outline-none bgrn-main-90p p-2 text-xs text-tertiary" onchange="g_SYW.Ytl.EventOnchangeSelectPal4Ytl(event)">
+                        <option value="" hidden selected>PAL 목록</option>
+                    </select>
+
+                    <select id="selectConvPal4Ytl" class="border-none outline-none bgrn-main-90p p-2 text-xs text-tertiary" onchange="g_SYW.Ytl.EventOnchangeConvPal4Ytl(event)">
+                        <option value="" hidden selected>변환 PAL 목록</option>
+                    </select>
+
+                    <div class="grid grid-cols-2 g-2">
+                        <button type="button" id="btnLoadPal4Ytl" class="border-none outline-none bgrn-main text-xs text-white px-4 py-2 w-full cursor-pointer" title="불러오기" onclick="g_SYW.Ytl.fnLoadPal()">불러오기</button>
+                        <button type="button" id="btnConvNSavePal4Ytl" class="border-none outline-none bgrn-main text-xs text-white px-4 py-2 w-full cursor-pointer" title="변환 및 저장" onclick="g_SYW.Ytl.fnConvNSavePal()">변환 및 저장</button>
+                    </div>
+                </div>
+                <hr>
+
+                <!-- IMG2YTL -->
+                <div class="flex flex-col g-2">
+                    <h4 class="text-xs text-main">IMG &rightarrow; YTL</h4>
+
+                    <div class="flex flex-col g-2">
+                        <label for="numboxConvImg2YtlFrameWidth" class="flex items-center g-2" title="타일 가로">
+                            <span class="text-s text-tertiary whitespace-nowrap">타일 가로</span>
+                            <input type="number" id="numboxConvImg2YtlFrameWidth" class="border-none outline-none bgrn-main-90p text-s text-tertiary p-2 w-full" min="0" value="0">
+                        </label>
+                        <label for="numboxConvImg2YtlFrameHeight" class="flex items-center g-2" title="타일 세로">
+                            <span class="text-s text-tertiary whitespace-nowrap">타일 세로</span>
+                            <input type="number" id="numboxConvImg2YtlFrameHeight" class="border-none outline-none bgrn-main-90p text-s text-tertiary p-2 w-full" min="0" value="0">
+                        </label>
+                        <label for="numboxConvImg2YtlNumberOfFrames" class="flex items-center g-2" title="타일 개수">
+                            <span class="text-s text-tertiary whitespace-nowrap">타일 개수</span>
+                            <input type="number" id="numboxConvImg2YtlNumberOfFrames" class="border-none outline-none bgrn-main-90p text-s text-tertiary p-2 w-full" min="0" value="0">
+                        </label>
+                    </div>
+
+                    <div class="flex items-center g-2">
+                        <button type="button" id="btnLoadNConvImg4Ytl" class="border-none outline-none bgrn-main text-xs text-white px-4 py-2 w-full cursor-pointer" title="불러오기 및 변환" onclick="g_SYW.Ytl.fnConvImg4Ytl()">불러오기 및 변환</button>
+                    </div>
+                </div>
+                <hr>
+            </div>
+
+            <div id="yavMenu" hidden class="flex flex-col g-2">
+                <!-- YAV -->
+                <div class="flex flex-col g-2">
+                    <h4 class="text-xs text-main">YAV</h4>
+
+                    <table id="tableYavInfo">
+                        <thead>
+                            <tr>
+                                <th>Playtime</th>
+                            </tr>
+                        </thead>
+                        <tbody><tr></tr></tbody>
+                    </table>
+
+                    <select id="selectYav" class="border-none outline-none bgrn-main-90p p-2 text-xs text-tertiary" onchange="g_SYW.Yav.EventOnChangeSelectYav(event)">
+                        <option value="" hidden selected>YAV 목록</option>
+                    </select>
+
+                    <div class="grid grid-cols-2 g-2">
+                        <button type="button" id="btnLoadYav" class="border-none outline-none bgrn-main text-xs text-white px-4 py-2 w-full cursor-pointer" title="불러오기" onclick="g_SYW.Yav.fnLoadYav()">불러오기</button>
+                        <button type="button" id="btnSaveWav" class="border-none outline-none bgrn-main text-xs text-white px-4 py-2 w-full cursor-pointer" title="WAV 저장" onclick="g_SYW.Yav.fnSaveWav()">WAV 저장</button>
+                    </div>
+                </div>
+                <hr>
+
+                <!-- WAV2YAV -->
+                <div class="flex flex-col g-2">
+                    <h4 class="text-xs text-main">WAV &rightarrow; YAV</h4>
+                    
+                    <div class="flex items-center g-2">
+                        <button type="button" id="btnLoadNConvWav2Yav" class="border-none outline-none bgrn-main text-xs text-white px-4 py-2 w-full cursor-pointer" title="불러오기 및 변환" onclick="g_SYW.Yav.fnLoadNConvWav2Yav()">불러오기 및 변환</button>
+                    </div>
+                </div>                 
+            </div>
+        </div>
+
+        <script defer src="./assets/js/pal.js"></script>
+        <script defer src="./assets/js/spr.js"></script>
+        <script defer src="./assets/js/yav.js"></script>
+        <script defer src="./assets/js/ytl.js"></script>
+        <script defer src="./assets/js/main.js"></script>
+    </body>
 </html>

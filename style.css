@@ -1,0 +1,61 @@
+@charset 'utf-8';
+
+/* Variables */
+:root {
+    --main-color: cornflowerblue;
+    --main-color-90p: color-mix(in srgb, var(--main-color), transparent 90%);
+    --main-color-60p: color-mix(in srgb, var(--main-color), transparent 60%);
+    --bgrn-color: #f5f7f9;
+    --bgrn-white-5p: color-mix(in srgb, white, transparent 5%);
+    --text-color: #222;
+    --text-color2: #444;
+    --text-color3: #666;
+    --border-color: #dbdbdb;
+}
+
+/* ALL */
+*{box-sizing:border-box;border-width:0}
+*::before,*::after{border-width:0}
+
+/* HTML */
+html{line-height:1.5;color:var(--text-color)}
+
+/* Controls */
+button,input,textarea{color:var(--text-color)}
+
+/* Attributes */
+[hidden]{display:none}
+
+/* Input Style */
+[type=checkbox]{appearance:none;width:1rem;height:1rem;color:var(--main-color);vertical-align:middle;background:0 0;border:1px solid var(--border-color);outline:0;margin:0;transition:background .25s;cursor:pointer}
+[type=checkbox]::before{content:'';color:transparent;display:block;width:inherit;height:inherit;background-color:transparent;background-size:contain}
+[type=checkbox]:checked{background-color:currentColor;border:none}
+[type=checkbox]:checked::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E %3Cpath d='M15.88 8.29L10 14.17l-1.88-1.88a.996.996 0 1 0-1.41 1.41l2.59 2.59c.39.39 1.02.39 1.41 0L17.3 9.7a.996.996 0 0 0 0-1.41c-.39-.39-1.03-.39-1.42 0z' fill='%23fff'/%3E %3C/svg%3E")}
+[type=checkbox]:disabled{background-color:var(--border-color);opacity:.85;cursor:not-allowed}
+[type=radio]{appearance:none}
+[type=number]:disabled{background-color:var(--border-color);color:var(--text-color3);cursor:not-allowed}
+
+/* Hr */
+hr{width:100%;border-bottom:1px dashed var(--border-color);overflow:visible;height:0}
+hr::after{position:relative;top:-8px;left:50%;transform:translateX(-50%);content:'\2702';font-size:1rem;color:var(--border-color)}
+
+/* Table */
+table{border-collapse:collapse;font-size:.75rem;text-align:left;overflow:hidden}
+thead tr{color:#fff;background-color:var(--main-color)}
+tbody tr{color:var(--text-color2);border-bottom:1px solid var(--border-color)}
+tbody tr:nth-of-type(2n){background-color:var(--bgrn-color)}
+tbody tr:nth-of-type(odd):hover{background-color:var(--main-color-95p)}
+tbody tr:last-of-type{border-bottom:2px solid var(--main-color)}
+td,th{padding:.5rem}
+
+/* HEADER */
+#header h1::after{content:' Beta';font-size:.75rem;color:var(--main-color);vertical-align:super}
+#header button:hover{color:var(--main-color)}
+#header label{border-bottom:2px solid var(--main-color-90p)}
+#header label:not(:has(input:checked)):hover{border-bottom-color:var(--main-color-60p)}
+#header label:has(input:checked){border-bottom-color:var(--main-color)}
+#header label:has(input:checked)>span{color:var(--main-color)}
+
+/* MENU */
+#menu{left:-301px}
+#menu.show{left:0}
